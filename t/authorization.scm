@@ -4,8 +4,8 @@
 (use s3.authorization)
 (test-module 's3.authorization)
 
-(define test-access-key #f) ; put your access-key for s3
-(define test-secret-key #f) ; put your secref-key for s3
+(define test-access-key "0PN5J17HBGZHT7JJ3X82")
+(define test-secret-key "uV3F3YluFJax1cknvbcGwgjvx4QpvB+leU8dUj2o")
 
 (define test-cases
   '(((name "Basic GET")
