@@ -12,6 +12,4 @@
 		     :access-key access-key
 		     :secret-key secret-key))
 
-(print (slot-ref bucketlist'raw))
-
 (test-end)

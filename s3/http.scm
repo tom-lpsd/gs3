@@ -1,8 +1,6 @@
 (define-module s3.http
   (use rfc.http)
   (use srfi-19)
-  (use sxml.ssax)
-  (use sxml.serializer)
   (use s3.constants)
   (use s3.authorization)
   (export s3:get))
@@ -16,16 +14,18 @@
 (with-module rfc.http
   (export http-generic))
 
-(define (s3:get access-key secret-key path)
-  (let* ((date (date->http-date-string (current-date)))
-	 (headers `("Date" ,date))
-	 (sign (s3:signiture secret-key :GET path headers))
-	 (auth-value #`"AWS ,|access-key|:,sign"))
-    (receive (code headers body)
-	(http-generic 'GET s3:host path #f
-		      (cons "Authorization" (cons auth-value headers)))
-      (call-with-input-string body
-	(lambda (in)
-	    (ssax:xml->sxml in `[(#f . ,s3:namespace)]))))))
+(define (append-header key value headers)
+  (cons key (cons value headers)))
+
+(define (s3:get access-key secret-key path . opts)
+  (let-keywords* opts ((bucketname "")
+		       (headers '()))
+    (let* ((host (string-append bucketname s3:host))
+	   (date (date->http-date-string (current-date)))
+	   (headers (append-header "Date" date headers))
+	   (sign (s3:signiture secret-key :GET path headers))       
+	   (auth-value #`"AWS ,|access-key|:,sign"))
+      (http-generic 'GET host path #f
+		    (append-header "Authorization" auth-value headers)))))
 
 (provide "s3/http")
