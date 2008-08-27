@@ -4,6 +4,7 @@
   (use sxml.ssax)
   (use sxml.sxpath)
   (use sxml.serializer)
+  (use gauche.parameter)
   (export <s3:bucketlist> bucket-names))
 (select-module s3.bucketlist)
 
@@ -30,7 +31,7 @@
 
 (define (get-bucketlist-sxml access-key secret-key)
   (receive (code header body)
-      (s3:get access-key secret-key "/")
+      (s3:http-get access-key secret-key "/")
     (call-with-input-string body
       (cut ssax:xml->sxml <> `[(#f . ,s3:namespace)]))))
 

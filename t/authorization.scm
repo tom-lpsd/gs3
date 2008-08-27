@@ -99,10 +99,10 @@
 		   (host (search-host headers)))
 	      (test* name
 		     canon
-		     (s3:canonicalize method path headers `(:host ,host)))
+		     (s3:canonicalize method host path headers '()))
 	      (test* name
 		     sign
-		     (s3:signiture test-secret-key method path headers :host host))))
+		     (s3:signiture test-secret-key method host path headers))))
 	  test-cases)
      
 (test-end)
