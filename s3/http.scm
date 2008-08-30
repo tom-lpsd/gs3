@@ -3,7 +3,7 @@
   (use srfi-19)
   (use s3.constants)
   (use s3.authorization)
-  (export s3:http-get))
+  (export s3:http-get s3:http-put s3:http-post s3:http-delete))
 (select-module s3.http)
 
 (define (date->http-date-string date)
@@ -18,9 +18,10 @@
   (cons key (cons value headers)))
 
 (define (s3:http-generic access-key secret-key method path body opts)
-  (let-keywords opts ((bucketname "")
-		      (headers '()))
-    (let* ((host (string-append bucketname s3:host))
+  (let-keywords opts ((bucketname #f)
+		      (headers '())
+		      . opts)
+    (let* ((host (if bucketname #`",|bucketname|.,s3:host" s3:host))
 	   (date (date->http-date-string (current-date)))
 	   (headers (append-header "Date" date headers))
 	   (sign (s3:signiture secret-key method host path headers))       

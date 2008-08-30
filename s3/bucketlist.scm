@@ -5,29 +5,16 @@
   (use sxml.sxpath)
   (use sxml.serializer)
   (use gauche.parameter)
-  (export <s3:bucketlist> bucket-names))
+  (export <s3:bucketlist>
+	  s3:put-bucket
+	  s3:get-bucket
+	  s3:delete-bucket
+	  s3:get-bucket-names))
 (select-module s3.bucketlist)
 
 (define-class <s3:bucketlist> ()
-  (owner buckets))
-
-(define (get-element-text element-name sxml)
-  (car ((sxpath (list element-name '*text*)) sxml)))
-
-(define (make-owner-alist sxml)
-  (list (cons 'id (get-element-text 'ID sxml))
-	(cons 'display-name (get-element-text 'DisplayName sxml))))
-
-(define (make-bucket-alist sxml)
-  (list (cons 'name (get-element-text 'Name sxml))
-	(cons 'creation-date (get-element-text 'CreationDate sxml))))
-
-(define (construct-bucketlist self sxml)
-  (let ((owner (car ((sxpath "//ListAllMyBucketsResult/Owner") sxml)))
-	(buckets ((sxpath "//Bucket") sxml)))
-    (slot-set! self 'owner (make-owner-alist owner))
-    (slot-set! self 'buckets
-	       (map make-bucket-alist buckets))))
+  ((access-key :init-keyword :access-key)
+   (secret-key :init-keyword :secret-key)))
 
 (define (get-bucketlist-sxml access-key secret-key)
   (receive (code header body)
@@ -37,14 +24,29 @@
 
 (define-method initialize ((self <s3:bucketlist>) args)
   (next-method)
-  (let-keywords args ((access-key #f)
-		      (secret-key #f))
-    (if (and access-key secret-key)
-	(construct-bucketlist self (get-bucketlist-sxml access-key secret-key))
-	(error "s3.initialize: please specify accsess key and secret key"))))
+  (unless (and (slot-ref self'access-key)
+	       (slot-ref self'secret-key))
+    (error "s3:bucketlist initialize: please specify accsess key and secret key")))
 
 (define (bucket-names self)
   (map (lambda (bucket)
 	 (cdr (assq 'name bucket))) (slot-ref self 'buckets)))
+
+(define (s3:get-bucket-names bucketlist)
+  (let ((sxml (get-bucketlist-sxml (slot-ref bucketlist'access-key)
+				   (slot-ref bucketlist'secret-key))))
+    ((sxpath "//Bucket/Name/text()") sxml)))
+
+(define (s3:put-bucket bucketlist name)
+  (s3:http-put (slot-ref bucketlist'access-key)
+	       (slot-ref bucketlist'secret-key)
+	       "/" #f :bucketname name))
+
+(define (s3:delete-bucket bucketlist name)
+  (s3:http-delete (slot-ref bucketlist'access-key)
+		  (slot-ref bucketlist'secret-key)
+		  "/" :bucketname name))
+
+(define (s3:get-bucket bucketlist name))
 
 (provide "s3/bucketlist")
