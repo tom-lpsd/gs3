@@ -38,14 +38,22 @@
     ((sxpath "//Bucket/Name/text()") sxml)))
 
 (define (s3:put-bucket bucketlist name)
-  (s3:http-put (slot-ref bucketlist'access-key)
-	       (slot-ref bucketlist'secret-key)
-	       "/" #f :bucketname name))
+  (receive (code header body)
+      (s3:http-put (slot-ref bucketlist'access-key)
+		   (slot-ref bucketlist'secret-key)
+		   "/" #f :bucketname name)
+    (if (= code 200)
+	header
+	(error "s3:put-bucket: response code is not 200"))))
 
 (define (s3:delete-bucket bucketlist name)
-  (s3:http-delete (slot-ref bucketlist'access-key)
-		  (slot-ref bucketlist'secret-key)
-		  "/" :bucketname name))
+  (receive (code header body)
+      (s3:http-delete (slot-ref bucketlist'access-key)
+		      (slot-ref bucketlist'secret-key)
+		      "/" :bucketname name)
+    (if (= code 204)
+	header
+	(error "s3:delete-bucket: response code is not 204"))))
 
 (define (s3:get-bucket bucketlist name))
 

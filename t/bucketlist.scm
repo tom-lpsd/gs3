@@ -12,7 +12,6 @@
 		     :access-key access-key
 		     :secret-key secret-key))
 
-
 (print (s3:get-bucket-names bucketlist))
 
 (s3:get-bucket bucketlist "tom-lpsd-foo")

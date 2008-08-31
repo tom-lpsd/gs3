@@ -12,6 +12,22 @@
    "~@a, ~d ~@b ~Y ~X GMT"))
 
 (with-module rfc.http
+
+  (define (receive-body remote headers sink flusher)
+    (cond ((assoc "content-length" headers)
+	   => (lambda (p)
+		(receive-body-nochunked (x->integer (cadr p)) remote sink)))
+	  ((assoc "transfer-encoding" headers)
+	   => (lambda (p)
+		(if (equal? (cadr p) "chunked")
+		    (receive-body-chunked remote sink)
+		    (error <http-error> "unsupported transfer-encoding" (cadr p)))))
+	  (else #f))
+    (flusher sink headers))
+
+  (define (receive-body-nochunked size remote sink)
+    (if (= size 0) #f (copy-port remote sink :size size)))
+
   (export http-generic))
 
 (define (append-header key value headers)
