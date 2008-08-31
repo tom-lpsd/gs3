@@ -2,6 +2,7 @@
 (test-start "s3 module test")
 
 (use s3)
+(use s3.account)
 (test-module 's3)
 
 (define (get-account)
@@ -12,9 +13,6 @@
 	(values access-key secret-key)))))
 
 (receive (access-key secret-key) (get-account)
-  (let ((account (make <s3:account>
-		   :access-key access-key
-		   :secret-key secret-key)))
-    (s3:get-bucket-names account)))
+    #?=(s3:get-bucket-names (make-account-from-file "s3.conf")))
 
 (test-end)

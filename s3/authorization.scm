@@ -40,9 +40,11 @@
   (if (not host)
       ""
       (rxmatch-case host
-	[#/(.*)\.s3\.amazonaws\.com/ (#f bucket) #`"/,bucket"]
+	[#/(.*)\.s3\.amazonaws\.com/ (#f bucket)
+	   (string-append "/" (string-downcase bucket))]
 	[#/^s3\.amazonaws\.com$/ (#f) ""]
-	[#/([^:]*)(:\d+)?/ (#f bucket #f) #`"/,bucket"]
+	[#/([^:]*)(:\d+)?/ (#f bucket #f)
+	   (string-append "/" (string-downcase bucket))]
 	[else ""])))
 
 (define (merge-headers headers)
