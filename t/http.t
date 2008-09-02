@@ -5,4 +5,5 @@
 (test-module 's3.http)
 
 (print (date->http-date-string (current-date)))
+
 (test-end)
