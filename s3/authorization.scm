@@ -67,8 +67,8 @@
 	(with-output-to-string
 	  (lambda ()
 	    (print (string-upcase
-		    (if (keyword? method)
-			(keyword->string method) method)))
+		    (if (symbol? method)
+			(symbol->string method) method)))
 	    (for-each print (list md5 type date))
 	    (for-each (lambda (pair)
 			(print (car pair) ":" (cdr pair)))

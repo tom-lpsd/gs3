@@ -3,7 +3,7 @@
   (use s3.constants)
   (use sxml.ssax)
   (use sxml.sxpath)
-  (extend s3.account s3.bucket)
+  (extend s3.account s3.bucket s3.object)
   (export s3:get-bucket-names))
 (select-module s3)
 

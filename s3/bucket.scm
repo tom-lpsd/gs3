@@ -10,7 +10,7 @@
 (define (s3:put-bucket account name)
   (receive (code header body)
       (s3:http-put (s3:access-key account)
-		   (s3:secret-key account) "/" #f :bucketname name)
+		   (s3:secret-key account) "/" "" :bucketname name)
     (if (string=? code "200")
 	header
 	(error "s3:put-bucket: response code is not 200"

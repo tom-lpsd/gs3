@@ -9,7 +9,7 @@
 
 (test-module 's3.object)
 
-(define bucket-name (make-random-string 10))
+(define bucket-name "tom-lpsd")
 (define object-name (make-random-string 10))
 (define object-body (make-random-string 100))
 

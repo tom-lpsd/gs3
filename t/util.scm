@@ -1,3 +1,6 @@
+(use srfi-1)
+(use math.mt-random)
+
 (define account (make-account-from-file "s3.conf"))
 
 (define (make-random-string n)
